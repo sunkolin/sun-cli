@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -124,6 +125,7 @@ func main() {
 	cronExpr := flag.String("cron", "", "显示cron表达式最近10次执行时间")
 	uppercaseInput := flag.String("uppercase", "", "将字符串转换为大写")
 	lowercaseInput := flag.String("lowercase", "", "将字符串转换为小写")
+	jsonFormatInput := flag.String("jsonformat", "", "格式化JSON字符串")
 
 	// 3. 解析参数
 	flag.Parse()
@@ -213,7 +215,24 @@ func main() {
 		return
 	}
 
-	// 17. 业务逻辑
+	// 17. 检查是否请求格式化JSON
+	if *jsonFormatInput != "" {
+		var jsonData interface{}
+		err := json.Unmarshal([]byte(*jsonFormatInput), &jsonData)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "错误: 无效的JSON格式 - %v\n", err)
+			os.Exit(1)
+		}
+		formatted, err := json.MarshalIndent(jsonData, "", "  ")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "错误: 格式化JSON失败 - %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println(string(formatted))
+		return
+	}
+
+	// 18. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")
