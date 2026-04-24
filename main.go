@@ -10,11 +10,19 @@ func main() {
 	name := flag.String("name", "陌生人", "你的名字")
 	age := flag.Int("age", 0, "你的年龄")
 	verbose := flag.Bool("verbose", false, "显示详细信息")
+	showVersion := flag.Bool("v", false, "显示版本信息")
+	showVersionLong := flag.Bool("version", false, "显示版本信息")
 
 	// 2. 解析参数
 	flag.Parse()
 
-	// 3. 业务逻辑
+	// 3. 检查是否请求版本信息
+	if *showVersion || *showVersionLong {
+		fmt.Println("1.0.0")
+		return
+	}
+
+	// 4. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")

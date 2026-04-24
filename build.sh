@@ -8,3 +8,5 @@ GOOS=darwin GOARCH=amd64 go build -o sun main.go
 
 # mac arm
 GOOS=darwin GOARCH=arm64 go build -o sun main.go
+
+
