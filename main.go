@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -47,6 +48,9 @@ func main() {
 	verbose := flag.Bool("verbose", false, "显示详细信息")
 	showVersion := flag.Bool("v", false, "显示版本信息")
 	showVersionLong := flag.Bool("version", false, "显示版本信息")
+	showTime := flag.Bool("time", false, "显示当前时间")
+	showDate := flag.Bool("date", false, "显示当前日期")
+	showDateTime := flag.Bool("datetime", false, "显示当前日期和时间")
 
 	// 3. 解析参数
 	flag.Parse()
@@ -57,7 +61,25 @@ func main() {
 		return
 	}
 
-	// 5. 业务逻辑
+	// 5. 检查是否请求时间信息
+	if *showTime {
+		fmt.Println(time.Now().Format("15:04:05"))
+		return
+	}
+
+	// 6. 检查是否请求日期信息
+	if *showDate {
+		fmt.Println(time.Now().Format("2006-01-02"))
+		return
+	}
+
+	// 7. 检查是否请求日期时间信息
+	if *showDateTime {
+		fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+		return
+	}
+
+	// 8. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")
