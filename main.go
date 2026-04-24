@@ -12,6 +12,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/robfig/cron/v3"
 	"github.com/google/uuid"
 	"gopkg.in/yaml.v3"
 )
@@ -47,6 +48,25 @@ func calculateSHA256(input string) string {
 func calculateSHA512(input string) string {
 	hash := sha512.Sum512([]byte(input))
 	return hex.EncodeToString(hash[:])
+}
+
+// getNextCronTimes 获取cron表达式接下来10次执行时间
+func getNextCronTimes(expression string) ([]string, error) {
+	schedule, err := cron.ParseStandard(expression)
+	if err != nil {
+		return nil, fmt.Errorf("解析cron表达式失败: %v", err)
+	}
+
+	var times []string
+	now := time.Now()
+	
+	for i := 0; i < 10; i++ {
+		next := schedule.Next(now)
+		times = append(times, next.Format("2006-01-02 15:04:05"))
+		now = next
+	}
+
+	return times, nil
 }
 
 // generateRandomString 生成指定长度的随机字符串
@@ -100,6 +120,7 @@ func main() {
 	sha1Input := flag.String("sha1", "", "计算字符串的SHA1值")
 	sha256Input := flag.String("sha256", "", "计算字符串的SHA256值")
 	sha512Input := flag.String("sha512", "", "计算字符串的SHA512值")
+	cronExpr := flag.String("cron", "", "显示cron表达式最近10次执行时间")
 
 	// 3. 解析参数
 	flag.Parse()
@@ -164,7 +185,20 @@ func main() {
 		return
 	}
 
-	// 14. 业务逻辑
+	// 14. 检查是否请求cron执行时间
+	if *cronExpr != "" {
+		times, err := getNextCronTimes(*cronExpr)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "错误: %v\n", err)
+			os.Exit(1)
+		}
+		for _, t := range times {
+			fmt.Println(t)
+		}
+		return
+	}
+
+	// 15. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")
