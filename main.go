@@ -53,7 +53,7 @@ func main() {
 
 	// 4. 检查是否请求版本信息
 	if *showVersion || *showVersionLong {
-		fmt.Printf("%s version %s\n", config.App.Name, config.App.Version)
+		fmt.Printf("%s version is %s\n", config.App.Name, config.App.Version)
 		return
 	}
 
