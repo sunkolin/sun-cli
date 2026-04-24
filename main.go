@@ -3,9 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"gopkg.in/yaml.v3"
 )
 
@@ -16,6 +18,18 @@ type Config struct {
 		Description string `yaml:"description"`
 		Version     string `yaml:"version"`
 	} `yaml:"app"`
+}
+
+// generateRandomString 生成指定长度的随机字符串
+func generateRandomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	rand.Seed(time.Now().UnixNano())
+	
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(b)
 }
 
 // loadConfig 从配置文件加载配置
@@ -51,6 +65,8 @@ func main() {
 	showTime := flag.Bool("time", false, "显示当前时间")
 	showDate := flag.Bool("date", false, "显示当前日期")
 	showDateTime := flag.Bool("datetime", false, "显示当前日期和时间")
+	showRandom := flag.Int("random", 0, "生成指定长度的随机字符串")
+	showUUID := flag.Bool("uuid", false, "生成UUID")
 
 	// 3. 解析参数
 	flag.Parse()
@@ -79,7 +95,19 @@ func main() {
 		return
 	}
 
-	// 8. 业务逻辑
+	// 8. 检查是否请求生成随机字符串
+	if *showRandom > 0 {
+		fmt.Println(generateRandomString(*showRandom))
+		return
+	}
+
+	// 9. 检查是否请求生成UUID
+	if *showUUID {
+		fmt.Println(uuid.New().String())
+		return
+	}
+
+	// 10. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")
