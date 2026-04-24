@@ -46,6 +46,37 @@ func calculateSHA256(input string) string {
 	return hex.EncodeToString(hash[:])
 }
 
+// splitString 使用多个分隔符分割字符串
+func splitString(input string, delimiters string) []string {
+	// 将分隔符字符串拆分为单个字符
+	delimRunes := []rune(delimiters)
+	
+	// 创建一个替换函数，将所有分隔符替换为同一个特殊字符
+	replacer := strings.NewReplacer(func() []string {
+		var replacements []string
+		for _, r := range delimRunes {
+			replacements = append(replacements, string(r), "\x00")
+		}
+		return replacements
+	}()...)
+	
+	// 替换所有分隔符
+	replaced := replacer.Replace(input)
+	
+	// 按照特殊字符分割
+	parts := strings.Split(replaced, "\x00")
+	
+	// 过滤空字符串
+	var result []string
+	for _, part := range parts {
+		if trimmed := strings.TrimSpace(part); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	
+	return result
+}
+
 // calculateSHA512 计算字符串的SHA512值
 func calculateSHA512(input string) string {
 	hash := sha512.Sum512([]byte(input))
@@ -127,6 +158,8 @@ func main() {
 	lowercaseInput := flag.String("lowercase", "", "将字符串转换为小写")
 	jsonFormatInput := flag.String("jsonformat", "", "格式化JSON字符串")
 	showTimestamp := flag.Bool("timestamp", false, "显示当前时间戳")
+	splitDelimiters := flag.String("delimiter", "", "分隔符（与--split一起使用）")
+	splitInput := flag.String("split", "", "待分割的字符串（需要配合--delimiter使用）")
 
 	// 3. 解析参数
 	flag.Parse()
@@ -239,7 +272,16 @@ func main() {
 		return
 	}
 
-	// 19. 业务逻辑
+	// 19. 检查是否请求分割字符串
+	if *splitInput != "" && *splitDelimiters != "" {
+		parts := splitString(*splitInput, *splitDelimiters)
+		for _, part := range parts {
+			fmt.Println(part)
+		}
+		return
+	}
+
+	// 20. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")
