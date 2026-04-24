@@ -126,6 +126,7 @@ func main() {
 	uppercaseInput := flag.String("uppercase", "", "将字符串转换为大写")
 	lowercaseInput := flag.String("lowercase", "", "将字符串转换为小写")
 	jsonFormatInput := flag.String("jsonformat", "", "格式化JSON字符串")
+	showTimestamp := flag.Bool("timestamp", false, "显示当前时间戳")
 
 	// 3. 解析参数
 	flag.Parse()
@@ -232,7 +233,13 @@ func main() {
 		return
 	}
 
-	// 18. 业务逻辑
+	// 18. 检查是否请求显示时间戳
+	if *showTimestamp {
+		fmt.Println(time.Now().Unix())
+		return
+	}
+
+	// 19. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")
