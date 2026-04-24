@@ -1,6 +1,11 @@
 package main
 
 import (
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -18,6 +23,30 @@ type Config struct {
 		Description string `yaml:"description"`
 		Version     string `yaml:"version"`
 	} `yaml:"app"`
+}
+
+// calculateMD5 计算字符串的MD5值
+func calculateMD5(input string) string {
+	hash := md5.Sum([]byte(input))
+	return hex.EncodeToString(hash[:])
+}
+
+// calculateSHA1 计算字符串的SHA1值
+func calculateSHA1(input string) string {
+	hash := sha1.Sum([]byte(input))
+	return hex.EncodeToString(hash[:])
+}
+
+// calculateSHA256 计算字符串的SHA256值
+func calculateSHA256(input string) string {
+	hash := sha256.Sum256([]byte(input))
+	return hex.EncodeToString(hash[:])
+}
+
+// calculateSHA512 计算字符串的SHA512值
+func calculateSHA512(input string) string {
+	hash := sha512.Sum512([]byte(input))
+	return hex.EncodeToString(hash[:])
 }
 
 // generateRandomString 生成指定长度的随机字符串
@@ -67,6 +96,10 @@ func main() {
 	showDateTime := flag.Bool("datetime", false, "显示当前日期和时间")
 	showRandom := flag.Int("random", 0, "生成指定长度的随机字符串")
 	showUUID := flag.Bool("uuid", false, "生成UUID")
+	md5Input := flag.String("md5", "", "计算字符串的MD5值")
+	sha1Input := flag.String("sha1", "", "计算字符串的SHA1值")
+	sha256Input := flag.String("sha256", "", "计算字符串的SHA256值")
+	sha512Input := flag.String("sha512", "", "计算字符串的SHA512值")
 
 	// 3. 解析参数
 	flag.Parse()
@@ -107,7 +140,31 @@ func main() {
 		return
 	}
 
-	// 10. 业务逻辑
+	// 10. 检查是否请求计算MD5
+	if *md5Input != "" {
+		fmt.Println(calculateMD5(*md5Input))
+		return
+	}
+
+	// 11. 检查是否请求计算SHA1
+	if *sha1Input != "" {
+		fmt.Println(calculateSHA1(*sha1Input))
+		return
+	}
+
+	// 12. 检查是否请求计算SHA256
+	if *sha256Input != "" {
+		fmt.Println(calculateSHA256(*sha256Input))
+		return
+	}
+
+	// 13. 检查是否请求计算SHA512
+	if *sha512Input != "" {
+		fmt.Println(calculateSHA512(*sha512Input))
+		return
+	}
+
+	// 14. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")

@@ -11,7 +11,7 @@ GOOS=darwin GOARCH=amd64 go build -o sun main.go
 
 # 生成压缩包
 echo "正在创建压缩包..."
-zip sun.zip sun sun.exe
+zip sun.zip sun sun.exe config.yaml
 echo "✅ 压缩包 sun.zip 已生成"
 
 
