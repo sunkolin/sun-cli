@@ -77,6 +77,23 @@ func splitString(input string, delimiters string) []string {
 	return result
 }
 
+// joinStrings 将多行字符串用分隔符合并
+func joinStrings(input string, delimiter string) string {
+	// 按换行符分割
+	lines := strings.Split(input, "\n")
+	
+	// 过滤空行
+	var nonEmptyLines []string
+	for _, line := range lines {
+		if trimmed := strings.TrimSpace(line); trimmed != "" {
+			nonEmptyLines = append(nonEmptyLines, trimmed)
+		}
+	}
+	
+	// 用分隔符连接
+	return strings.Join(nonEmptyLines, delimiter)
+}
+
 // calculateSHA512 计算字符串的SHA512值
 func calculateSHA512(input string) string {
 	hash := sha512.Sum512([]byte(input))
@@ -158,8 +175,9 @@ func main() {
 	lowercaseInput := flag.String("lowercase", "", "将字符串转换为小写")
 	jsonFormatInput := flag.String("jsonformat", "", "格式化JSON字符串")
 	showTimestamp := flag.Bool("timestamp", false, "显示当前时间戳")
-	splitDelimiters := flag.String("delimiter", "", "分隔符（与--split一起使用）")
+	delimiter := flag.String("delimiter", "", "分隔符/连接符（与--split或--join一起使用）")
 	splitInput := flag.String("split", "", "待分割的字符串（需要配合--delimiter使用）")
+	joinInput := flag.String("join", "", "待合并的多行字符串（需要配合--delimiter使用）")
 
 	// 3. 解析参数
 	flag.Parse()
@@ -273,15 +291,21 @@ func main() {
 	}
 
 	// 19. 检查是否请求分割字符串
-	if *splitInput != "" && *splitDelimiters != "" {
-		parts := splitString(*splitInput, *splitDelimiters)
+	if *splitInput != "" && *delimiter != "" {
+		parts := splitString(*splitInput, *delimiter)
 		for _, part := range parts {
 			fmt.Println(part)
 		}
 		return
 	}
 
-	// 20. 业务逻辑
+	// 20. 检查是否请求合并字符串
+	if *joinInput != "" && *delimiter != "" {
+		fmt.Println(joinStrings(*joinInput, *delimiter))
+		return
+	}
+
+	// 21. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")
