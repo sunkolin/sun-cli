@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -121,6 +122,8 @@ func main() {
 	sha256Input := flag.String("sha256", "", "计算字符串的SHA256值")
 	sha512Input := flag.String("sha512", "", "计算字符串的SHA512值")
 	cronExpr := flag.String("cron", "", "显示cron表达式最近10次执行时间")
+	uppercaseInput := flag.String("uppercase", "", "将字符串转换为大写")
+	lowercaseInput := flag.String("lowercase", "", "将字符串转换为小写")
 
 	// 3. 解析参数
 	flag.Parse()
@@ -198,7 +201,19 @@ func main() {
 		return
 	}
 
-	// 15. 业务逻辑
+	// 15. 检查是否请求转换为大写
+	if *uppercaseInput != "" {
+		fmt.Println(strings.ToUpper(*uppercaseInput))
+		return
+	}
+
+	// 16. 检查是否请求转换为小写
+	if *lowercaseInput != "" {
+		fmt.Println(strings.ToLower(*lowercaseInput))
+		return
+	}
+
+	// 17. 业务逻辑
 	fmt.Println("========================")
 	fmt.Println("   我的通用 CLI 工具")
 	fmt.Println("========================")
