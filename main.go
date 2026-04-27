@@ -147,7 +147,65 @@ func loadConfig() (*Config, error) {
 	return &config, nil
 }
 
+// findShortForLong 根据长参数名查找对应的短参数名
+func findShortForLong(longName string, paramGroups map[string]string) (string, bool) {
+	for short, long := range paramGroups {
+		if long == longName {
+			return short, true
+		}
+	}
+	return "", false
+}
+
 func main() {
+	// 自定义 Usage 函数，使 -h 也显示紧凑格式
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of sun:\n")
+		
+		// 定义参数分组映射（短参数 -> 长参数）
+		paramGroups := map[string]string{
+			"v":       "version",
+		}
+		
+		// 记录已显示的参数
+		shown := make(map[string]bool)
+		
+		flag.VisitAll(func(f *flag.Flag) {
+			// 如果这个参数已经被作为短参数显示过了，跳过
+			if shown[f.Name] {
+				return
+			}
+			
+			// 检查是否有对应的长参数或短参数需要合并
+			var displayName string
+			if longName, ok := paramGroups[f.Name]; ok {
+				// 这是短参数，需要和长参数一起显示
+				displayName = fmt.Sprintf("-%s, --%s", f.Name, longName)
+				shown[longName] = true // 标记长参数已显示
+			} else if _, exists := findShortForLong(f.Name, paramGroups); exists {
+				// 这是长参数，且已经有短参数显示过它了，跳过
+				return
+			} else {
+				// 普通参数，直接显示
+				displayName = fmt.Sprintf("--%s", f.Name)
+			}
+			
+			// 根据参数类型添加占位符
+			switch f.Value.String() {
+			case "0":
+				// int 类型
+				displayName += " <int>"
+			case "false":
+				// bool 类型，不需要占位符
+			default:
+				// string 类型
+				displayName += " <string>"
+			}
+			
+			fmt.Fprintf(os.Stderr, "  %-30s %s\n", displayName, f.Usage)
+		})
+	}
+
 	// 1. 加载配置文件
 	config, err := loadConfig()
 	if err != nil {
@@ -156,8 +214,6 @@ func main() {
 	}
 
 	// 2. 定义命令行参数
-	name := flag.String("name", "陌生人", "你的名字")
-	age := flag.Int("age", 0, "你的年龄")
 	verbose := flag.Bool("verbose", false, "显示详细信息")
 	showVersion := flag.Bool("v", false, "显示版本信息")
 	showVersionLong := flag.Bool("version", false, "显示版本信息")
@@ -182,9 +238,15 @@ func main() {
 	// 3. 解析参数
 	flag.Parse()
 
-	// 4. 检查是否请求版本信息
+	// 4. 如果没有提供任何参数，显示帮助信息
+	if len(os.Args) == 1 {
+		flag.Usage()
+		return
+	}
+
+	// 5. 检查是否请求版本信息
 	if *showVersion || *showVersionLong {
-		fmt.Printf("%s version is %s\n", config.App.Name, config.App.Version)
+		fmt.Println(config.App.Version)
 		return
 	}
 
@@ -305,19 +367,13 @@ func main() {
 		return
 	}
 
-	// 21. 业务逻辑
-	fmt.Println("========================")
-	fmt.Println("   我的通用 CLI 工具")
-	fmt.Println("========================")
-
+	// 21. 默认业务逻辑（无参数时不会到达这里）
 	if *verbose {
 		fmt.Println("[调试模式] 已开启")
 	}
 
-	fmt.Printf("你好：%s\n", *name)
-	if *age > 0 {
-		fmt.Printf("年龄：%d 岁\n", *age)
-	}
-
+	fmt.Println("========================")
+	fmt.Println("   我的通用 CLI 工具")
+	fmt.Println("========================")
 	fmt.Println("\n✅ CLI 运行成功！")
 }
