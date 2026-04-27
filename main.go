@@ -369,7 +369,8 @@ func main() {
 
 	// 21. 默认业务逻辑（无参数时不会到达这里）
 	if *verbose {
-		fmt.Println("[调试模式] 已开启")
+		fmt.Println("我是常用工具集")
+		return
 	}
 
 	fmt.Println("========================")
