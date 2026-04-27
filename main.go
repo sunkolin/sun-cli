@@ -194,12 +194,12 @@ func main() {
 			switch f.Value.String() {
 			case "0":
 				// int 类型
-				displayName += " <int>"
+				displayName += " <arg>"
 			case "false":
 				// bool 类型，不需要占位符
 			default:
 				// string 类型
-				displayName += " <string>"
+				displayName += " <arg>"
 			}
 			
 			fmt.Fprintf(os.Stderr, "  %-30s %s\n", displayName, f.Usage)
